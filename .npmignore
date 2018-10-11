@@ -1,8 +1,11 @@
 *~
 build/
+.eslintrc
 .lock-wscript
 *.log
+Makefile
 node_modules/
 script/
 *.swp
 test/
+.travis.yml
