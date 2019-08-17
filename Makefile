@@ -60,8 +60,16 @@ test-binary: test-connection
 test-pool:
 	@find test/integration/connection-pool -name "*.js" | $(node-command) binary
 
+coverage:
+	npx nyc --reporter=html npm test && make test-unit test-integration
+
+coverage-native:
+	npx nyc --reporter=html npm test && make test-native
+
 lint:
 	@echo "***Starting lint***"
 	node -e "process.exit(Number(process.versions.node.split('.')[0]) < 8 ? 0 : 1)" \
 	  && echo "***Skipping lint (node version too old)***" \
 	  || node_modules/.bin/eslint lib
+
+.PHONY: coverage coverage-native
