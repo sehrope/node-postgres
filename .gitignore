@@ -1,7 +1,9 @@
 *~
 build/
+coverage
 .lock-wscript
 *.log
 node_modules/
+.nyc_output
 package-lock.json
 *.swp
