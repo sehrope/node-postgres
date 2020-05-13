@@ -52,6 +52,7 @@ suite.testAsync('can connect using sasl/scram', async () => {
   })
   await client.connect()
   assert.ok(usingSasl, 'Should be using SASL for authentication')
+  assert.equal((await client.query('SELECT 1 AS x')).rows[0].x, 1)
   await client.end()
 })
 
