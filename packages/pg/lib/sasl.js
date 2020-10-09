@@ -27,6 +27,10 @@ function continueSession(session, password, serverData) {
     throw new Error('SASL: SCRAM-SERVER-FIRST-MESSAGE: server nonce does not start with client nonce')
   }
 
+  if (!password) {
+    throw new Error('SASL: A non-empty password is required')
+  }
+
   var saltBytes = Buffer.from(sv.salt, 'base64')
 
   var saltedPassword = Hi(password, saltBytes, sv.iteration)

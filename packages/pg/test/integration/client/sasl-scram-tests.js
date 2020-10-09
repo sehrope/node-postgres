@@ -55,21 +55,50 @@ suite.testAsync('can connect using sasl/scram', async () => {
   await client.end()
 })
 
-suite.testAsync('sasl/scram fails when password is wrong', async () => {
-  const client = new pg.Client({
-    ...config,
+async function testScramFail(name, moreConfig, error, message) {
+  suite.testAsync(name, async () => {
+    const client = new pg.Client({
+      ...config,
+      ...moreConfig,
+    })
+    let usingSasl = false
+    client.connection.once('authenticationSASL', () => {
+      usingSasl = true
+    })
+    await assert.rejects(() => client.connect(), error, message)
+    assert.ok(usingSasl, 'Should be using SASL for authentication')
+  })
+}
+
+testScramFail(
+  'sasl/scram fails when password is wrong',
+  {
     password: config.password + 'append-something-to-make-it-bad',
-  })
-  let usingSasl = false
-  client.connection.once('authenticationSASL', () => {
-    usingSasl = true
-  })
-  await assert.rejects(
-    () => client.connect(),
-    {
-      code: '28P01',
-    },
-    'Error code should be for a password error'
-  )
-  assert.ok(usingSasl, 'Should be using SASL for authentication')
-})
+  },
+  {
+    code: '28P01',
+  },
+  'Error code should be for a password error'
+)
+
+testScramFail(
+  'sasl/scram fails when password is null',
+  {
+    password: null,
+  },
+  {
+    message: /SASL: A non-empty password is required/,
+  },
+  'Error code should be for a password error'
+)
+
+testScramFail(
+  'sasl/scram fails when password is empty string',
+  {
+    password: '',
+  },
+  {
+    message: /SASL: A non-empty password is required/,
+  },
+  'Error code should be for a password error'
+)
